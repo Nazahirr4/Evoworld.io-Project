@@ -48,6 +48,8 @@ function updateUI() {
 function googleLogin() {
     // Ask for email (simulating Google Sign-In)
     const email = prompt("Enter your Google email:");
+    // Attach Google login to button
+document.getElementById("google-login").addEventListener("click", googleLogin);
 
     if (email) {
         player.email = email;
