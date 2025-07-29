@@ -1,11 +1,23 @@
-// Game settings
-let playerLevel = 999; // Max level
-let allSkinsUnlocked = true; // Unlock all skins
-let gems = 0; // Disable gem currency
-let gemPurchasesEnabled = false; // No real money purchases
+// ============================
+// Account System Configuration
+// ============================
+
+// Default player data
+let player = {
+    email: null,
+    username: "Guest_" + Math.floor(Math.random() * 100000),
+    level: 1,
+    gems: 0,
+    premium: false,
+    skin: "Basic Fly"
+};
 
 // List of all skins including limited ones
-const skins = [
+const allSkins = [
+    "Grim Reaper",
+    "Pumpkin Reaper",
+    "Ghostly Reaper",
+    "Ghost",
     "Golden Dragon",
     "Shadow Ninja",
     "Cyber Samurai",
@@ -16,29 +28,54 @@ const skins = [
     "Royal Knight",
     "Ancient Pharaoh",
     "Dark Mage"
-    // Add more skins here later if needed
 ];
 
-// Show player level
-document.getElementById("player-level").innerHTML = `Your Level: <span>${playerLevel}</span>`;
+// Function to update the display on screen
+function updateUI() {
+    document.getElementById("username").textContent = player.username;
+    document.querySelector(".level-text").textContent = "Level: " + player.level;
 
-// Handle button click to view all skins
-document.getElementById("view-skins").addEventListener("click", function () {
-    const skinsList = document.getElementById("skins-list");
-
-    if (skinsList.classList.contains("hidden")) {
-        skinsList.classList.remove("hidden");
-        skinsList.innerHTML = "<h3>Unlocked Skins:</h3><ul>" +
-            skins.map(skin => `<li>${skin}</li>`).join("") +
-            "</ul>";
+    if (player.level === 999) {
+        document.querySelector(".player-image").src = "grim-reaper.png"; // your Grim Reaper image
+        document.querySelector(".level-display").textContent = "Level 999 - Grim Reaper";
     } else {
-        skinsList.classList.add("hidden");
-    }
-});
-
-// Block gem purchases completely
-function attemptPurchase() {
-    if (!gemPurchasesEnabled) {
-        alert("Gem purchases are disabled in this version!");
+        document.querySelector(".player-image").src = "basic-fly.png"; // normal fly image
+        document.querySelector(".level-display").textContent = "Level " + player.level;
     }
 }
+
+// Simulated Google login (replace with real Google Sign-In API later)
+function googleLogin() {
+    // Ask for email (simulating Google Sign-In)
+    const email = prompt("Enter your Google email:");
+
+    if (email) {
+        player.email = email;
+
+        if (email === "yandelfumbur@gmail.com") {
+            // Owner account perks
+            player.level = 999;
+            player.gems = 100000;
+            player.premium = true;
+            player.skin = "Grim Reaper";
+            alert("Welcome back, Owner! All skins unlocked, Level 999, Premium active.");
+        } else {
+            // Normal player account
+            player.level = 1;
+            player.gems = 0;
+            player.premium = false;
+            player.skin = "Basic Fly";
+            alert("Welcome, " + player.username + "! Starting at Level 1.");
+        }
+
+        updateUI();
+    }
+}
+
+// Handle Play button click
+document.getElementById("play-btn").addEventListener("click", function () {
+    alert("Starting game as " + player.skin + " at Level " + player.level);
+});
+
+// Run UI update on page load
+updateUI();
