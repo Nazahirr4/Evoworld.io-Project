@@ -1,18 +1,19 @@
-// ============================
-// Account System Configuration
-// ============================
-
-// Default player data
+// =========================
+// Player Information
+// =========================
 let player = {
-    email: null,
-    username: "Guest_" + Math.floor(Math.random() * 100000),
-    level: 1,
-    gems: 0,
-    premium: false,
-    skin: "Basic Fly"
+    email: "", // This will store your Google account email after login
+    username: "Guest_" + Math.floor(Math.random() * 100000), // Random guest username
+    level: 1,  // Default starting level for all new players
+    exp: 0,    // Experience points
+    gems: 0,   // Gems count (currency, but purchase disabled)
+    premium: false, // Premium status (not used yet)
+    skin: "Basic Fly" // Default skin
 };
 
-// List of all skins including limited ones
+// =========================
+// All Available Skins (includes limited ones)
+// =========================
 const allSkins = [
     "Grim Reaper",
     "Pumpkin Reaper",
@@ -23,61 +24,77 @@ const allSkins = [
     "Cyber Samurai",
     "Pumpkin King",
     "Ice Phantom",
-    "Fire Titan",
-    "Galaxy Warrior",
-    "Royal Knight",
-    "Ancient Pharaoh",
-    "Dark Mage"
+    "Legendary Phoenix"
 ];
 
-// Function to update the display on screen
-function updateUI() {
-    document.getElementById("username").textContent = player.username;
-    document.querySelector(".level-text").textContent = "Level: " + player.level;
+// =========================
+// Google Login Simulation
+// =========================
+function loginWithGoogle(email) {
+    player.email = email;
 
-    if (player.level === 999) {
-        document.querySelector(".player-image").src = "grim-reaper.png"; // your Grim Reaper image
-        document.querySelector(".level-display").textContent = "Level 999 - Grim Reaper";
+    // If the email is your account, auto-set level 999 and unlock all skins
+    if (email === "yandelfumbur@gmail.com") {
+        player.level = 999;
+        player.exp = 9999999; // Max EXP
+        player.skin = "Grim Reaper";
+        player.gems = Infinity; // Unlimited gems
+        player.premium = true;
+        alert("Welcome back, Yandel! Level 999 and all skins unlocked.");
     } else {
-        document.querySelector(".player-image").src = "basic-fly.png"; // normal fly image
-        document.querySelector(".level-display").textContent = "Level " + player.level;
+        alert("Logged in as " + email);
     }
+
+    updateUI();
 }
 
-// Simulated Google login (replace with real Google Sign-In API later)
-function googleLogin() {
-    // Ask for email (simulating Google Sign-In)
-    const email = prompt("Enter your Google email:");
-    // Attach Google login to button
-document.getElementById("google-login").addEventListener("click", googleLogin);
+// =========================
+// Missions System
+// =========================
+const missionTemplates = [
+    { text: "Play for X minutes", baseExp: 3000 },
+    { text: "Evolve Y times", baseExp: 1500 },
+    { text: "Defeat Z players", baseExp: 2000 },
+    { text: "Survive for W minutes", baseExp: 2500 }
+];
 
-    if (email) {
-        player.email = email;
-
-        if (email === "yandelfumbur@gmail.com") {
-            // Owner account perks
-            player.level = 999;
-            player.gems = 100000;
-            player.premium = true;
-            player.skin = "Grim Reaper";
-            alert("Welcome back, Owner! All skins unlocked, Level 999, Premium active.");
-        } else {
-            // Normal player account
-            player.level = 1;
-            player.gems = 0;
-            player.premium = false;
-            player.skin = "Basic Fly";
-            alert("Welcome, " + player.username + "! Starting at Level 1.");
-        }
-
-        updateUI();
-    }
+function generateMission() {
+    const randomMission = missionTemplates[Math.floor(Math.random() * missionTemplates.length)];
+    const missionExp = Math.floor(randomMission.baseExp * (1 + player.level / 100)); // scales with level
+    return {
+        description: randomMission.text,
+        rewardExp: missionExp
+    };
 }
 
-// Handle Play button click
-document.getElementById("play-btn").addEventListener("click", function () {
-    alert("Starting game as " + player.skin + " at Level " + player.level);
+// Display current mission
+let currentMission = generateMission();
+
+// =========================
+// Update the UI
+// =========================
+function updateUI() {
+    // Player level
+    const levelDisplay = document.querySelector(".level-display");
+    if (levelDisplay) levelDisplay.innerText = `Level ${player.level}`;
+
+    // Player skin
+    const skinImage = document.querySelector(".player-image");
+    if (skinImage) skinImage.alt = player.skin;
+
+    // Missions
+    const missionElement = document.querySelector(".mission");
+    if (missionElement) missionElement.innerText = `${currentMission.description} (+${currentMission.rewardExp} EXP)`;
+}
+
+// =========================
+// Event Listeners
+// =========================
+document.getElementById("google-login")?.addEventListener("click", function () {
+    const emailInput = prompt("Enter your Google account email:");
+    if (emailInput) loginWithGoogle(emailInput);
 });
 
-// Run UI update on page load
-updateUI();
+document.getElementById("play-btn")?.addEventListener("click", function () {
+    alert("Starting game with skin: " + player.skin + " at level " + player.level);
+});
